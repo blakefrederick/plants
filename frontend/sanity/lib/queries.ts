@@ -101,7 +101,8 @@ export const pagesSlugs = defineQuery(`
 `)
 
 export const allPlantsQuery = defineQuery(`
-  *[_type == "plant" && availability == true] | order(dateAdded desc) {
+  *[_type == "plant" && availability != false]
+  | order(coalesce(dateAdded, _createdAt) desc) {
     _id,
     name,
     "slug": slug.current,
@@ -117,6 +118,7 @@ export const allPlantsQuery = defineQuery(`
     "description": pt::text(description[0...1])
   }
 `)
+
 
 export const plantDetailsQuery = defineQuery(`
   *[_type == "plant" && slug.current == $slug][0]{
