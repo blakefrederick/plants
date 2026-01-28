@@ -99,3 +99,45 @@ export const pagesSlugs = defineQuery(`
   *[_type == "page" && defined(slug.current)]
   {"slug": slug.current}
 `)
+
+export const allPlantsQuery = defineQuery(`
+  *[_type == "plant" && availability == true] | order(dateAdded desc) {
+    _id,
+    name,
+    "slug": slug.current,
+    scientificName,
+    "image": images[0]{
+      alt,
+      "url": asset->url
+    },
+    category,
+    careLevel,
+    price,
+    "petSafe": toxicity.isPetSafe,
+    "description": pt::text(description[0...1])
+  }
+`)
+
+export const plantDetailsQuery = defineQuery(`
+  *[_type == "plant" && slug.current == $slug][0]{
+    _id,
+    name,
+    scientificName,
+    commonNames,
+    images[]{
+      alt,
+      caption,
+      "url": asset->url
+    },
+    description,
+    category,
+    careLevel,
+    lightRequirements,
+    wateringFrequency,
+    "size": matureSize,
+    "toxicity": toxicity,
+    price,
+    availability,
+    tags
+  }
+`)
