@@ -139,7 +139,7 @@ export const plant = defineType({
       },
     }),
     defineField({
-      name: 'mature Size',
+      name: 'matureSize',
       title: 'Mature Size',
       type: 'object',
       fields: [
@@ -240,6 +240,42 @@ export const plant = defineType({
       of: [{type: 'string'}],
       options: {
         layout: 'tags',
+      },
+    }),
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'object',
+      description: 'Search engine optimization settings',
+      fields: [
+        defineField({
+          name: 'metaTitle',
+          title: 'Meta Title',
+          type: 'string',
+          description: 'Title for search engines (50-60 characters)',
+          validation: (rule) => rule.max(60),
+        }),
+        defineField({
+          name: 'metaDescription',
+          title: 'Meta Description',
+          type: 'text',
+          description: 'Description for search engines (150-160 characters)',
+          validation: (rule) => rule.max(160),
+        }),
+        defineField({
+          name: 'keywords',
+          title: 'Keywords',
+          type: 'array',
+          of: [{type: 'string'}],
+          description: 'SEO keywords for this plant',
+          options: {
+            layout: 'tags',
+          },
+        }),
+      ],
+      options: {
+        collapsible: true,
+        collapsed: true,
       },
     }),
   ],
