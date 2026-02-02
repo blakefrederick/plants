@@ -908,6 +908,29 @@ export type AllPlantsQueryResult = Array<{
   description: string
 }>
 
+export type PlantsStatsQueryResult = {
+  totalPlants: number
+  availablePlants: number
+  petSafePlants: number
+  averagePrice: number
+  recentPlants: Array<{
+    name: string
+    slug: string
+    category:
+      | 'aquatic'
+      | 'fern'
+      | 'flower'
+      | 'grass'
+      | 'herb'
+      | 'houseplant'
+      | 'shrub'
+      | 'succulent'
+      | 'tree'
+      | 'vine'
+    careLevel: 'advanced' | 'beginner' | 'expert' | 'intermediate' | null
+  }>
+}
+
 // Source: sanity/lib/queries.ts
 // Variable: plantDetailsQuery
 // Query: *[_type == "plant" && slug.current == $slug][0]{    _id,    name,    scientificName,    commonNames,    images[]{      alt,      caption,      "url": asset->url    },    description,    category,    careLevel,    lightRequirements,    wateringFrequency,    "size": matureSize,    "toxicity": toxicity,    price,    availability,    tags  }
@@ -963,6 +986,7 @@ declare module '@sanity/client' {
     '\n  *[_type == "post" && defined(slug.current)]\n  {"slug": slug.current}\n': PostPagesSlugsResult
     '\n  *[_type == "page" && defined(slug.current)]\n  {"slug": slug.current}\n': PagesSlugsResult
     '\n  *[_type == "plant" && availability != false]\n  | order(coalesce(dateAdded, _createdAt) desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    scientificName,\n    "image": images[0]{\n      alt,\n      "url": asset->url\n    },\n    category,\n    careLevel,\n    price,\n    "petSafe": toxicity.isPetSafe,\n    "description": pt::text(description[0...1])\n  }\n': AllPlantsQueryResult
+    '\n  {\n    "totalPlants": count(*[_type == "plant"]),\n    "availablePlants": count(*[_type == "plant" && availability == true]),\n    "petSafePlants": count(*[_type == "plant" && toxicity.isPetSafe == true]),\n    "averagePrice": round(math::avg(*[_type == "plant" && defined(price)].price)),\n    "recentPlants": *[_type == "plant"] \n      | order(coalesce(dateAdded, _createdAt) desc) \n      [0...3] {\n        name,\n        "slug": slug.current,\n        category,\n        careLevel\n      }\n  }\n': PlantsStatsQueryResult
     '\n  *[_type == "plant" && slug.current == $slug][0]{\n    _id,\n    name,\n    scientificName,\n    commonNames,\n    images[]{\n      alt,\n      caption,\n      "url": asset->url\n    },\n    description,\n    category,\n    careLevel,\n    lightRequirements,\n    wateringFrequency,\n    "size": matureSize,\n    "toxicity": toxicity,\n    price,\n    availability,\n    tags\n  }\n': PlantDetailsQueryResult
   }
 }
