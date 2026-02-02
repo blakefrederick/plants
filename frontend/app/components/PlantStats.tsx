@@ -38,7 +38,7 @@ export async function PlantStats() {
             <div className="text-4xl md:text-5xl font-light text-bark mb-2">
               {metadata.availablePlants}
             </div>
-            <div className="text-sm text-sage tracking-wide uppercase">Available</div>
+            <div className="text-sm text-sage tracking-wide uppercase">Alive</div>
           </div>
           
           <div>
@@ -52,7 +52,7 @@ export async function PlantStats() {
             <div className="text-4xl md:text-5xl font-light text-bark mb-2">
               {metadata.petSafePlants}
             </div>
-            <div className="text-sm text-sage tracking-wide uppercase">Pet Safe</div>
+            <div className="text-sm text-sage tracking-wide uppercase">Flowering</div>
           </div>
         </div>
 

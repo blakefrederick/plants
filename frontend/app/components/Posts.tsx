@@ -88,7 +88,7 @@ export const AllPosts = async () => {
   }
 
   return (
-    <Posts subHeading="Journal">
+    <Posts subHeading="Details & Articles">
       {data.map((post: AllPostsQueryResult[number]) => (
         <Post key={post._id} post={post} />
       ))}
