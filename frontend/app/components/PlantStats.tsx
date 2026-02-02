@@ -64,7 +64,7 @@ export async function PlantStats() {
               {metadata.recentPlants.map((plant) => (
                 <Link
                   key={plant.slug}
-                  href={`/plants/${plant.slug}`}
+                  href={`/`}
                   className="group block p-6 border border-stone-200 hover:border-moss transition-colors"
                 >
                   <div className="text-lg text-bark group-hover:text-moss transition-colors mb-2">
