@@ -3,7 +3,6 @@ import {notFound} from 'next/navigation'
 import {type PortableTextBlock} from 'next-sanity'
 import {Suspense} from 'react'
 
-import Avatar from '@/app/components/Avatar'
 import {MorePosts} from '@/app/components/Posts'
 import PortableText from '@/app/components/PortableText'
 import Image from '@/app/components/SanityImage'
@@ -66,52 +65,69 @@ export default async function PostPage(props: Props) {
   }
 
   return (
-    <>
-      <div className="">
-        <div className="container my-12 lg:my-24 grid gap-12">
-          <div>
-            <div className="pb-6 grid gap-6 mb-6 border-b border-gray-100">
-              <div className="max-w-3xl flex flex-col gap-6">
-                <h1 className="text-4xl text-gray-900 sm:text-5xl lg:text-7xl">{post.title}</h1>
-              </div>
-              <div className="max-w-3xl flex gap-4 items-center">
-                {post.author && post.author.firstName && post.author.lastName && (
-                  <Avatar person={post.author} date={post.date} />
+    <div className="bg-cream min-h-screen">
+      <div className="pt-16 pb-12 md:pt-24 md:pb-16">
+        <div className="container">
+          <div className="max-w-2xl">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light text-bark leading-tight mb-6">
+              {post.title}
+            </h1>
+            {post.author && post.author.firstName && post.author.lastName && (
+              <div className="flex items-center gap-4 text-sm text-stone-500">
+                <span>{post.author.firstName} {post.author.lastName}</span>
+                {post.date && (
+                  <>
+                    <span className="text-stone-300">·</span>
+                    <time dateTime={post.date}>
+                      {new Date(post.date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </time>
+                  </>
                 )}
               </div>
-            </div>
-            <article className="gap-6 grid max-w-4xl">
-              <div className="">
-                {post?.coverImage && (
-                  <Image
-                    id={post.coverImage.asset?._ref || ''}
-                    alt={post.coverImage.alt || ''}
-                    className="rounded-sm w-full"
-                    width={1024}
-                    height={538}
-                    mode="cover"
-                    hotspot={post.coverImage.hotspot}
-                    crop={post.coverImage.crop}
-                  />
-                )}
-              </div>
-              {post.content?.length && (
-                <PortableText
-                  className="max-w-2xl prose-headings:font-medium prose-headings:tracking-tight"
-                  value={post.content as PortableTextBlock[]}
-                />
-              )}
-            </article>
+            )}
+            <div className="w-16 h-px bg-clay mt-8" />
           </div>
         </div>
       </div>
-      <div className="border-t border-gray-100 bg-gray-50">
-        <div className="container py-12 lg:py-24 grid gap-12">
-          <aside>
-            <Suspense>{await MorePosts({skip: post._id, limit: 2})}</Suspense>
-          </aside>
+      
+      <article className="pb-16 md:pb-24">
+        <div className="container">
+          <div className="max-w-2xl">
+            {post?.coverImage && (
+              <div className="mb-10">
+                <Image
+                  id={post.coverImage.asset?._ref || ''}
+                  alt={post.coverImage.alt || ''}
+                  className="w-full"
+                  width={800}
+                  height={450}
+                  mode="cover"
+                  hotspot={post.coverImage.hotspot}
+                  crop={post.coverImage.crop}
+                />
+              </div>
+            )}
+            {post.content?.length && (
+              <PortableText
+                className="prose prose-stone prose-lg max-w-none"
+                value={post.content as PortableTextBlock[]}
+              />
+            )}
+          </div>
         </div>
-      </div>
-    </>
+      </article>
+
+      <section className="py-16 border-t border-stone-200">
+        <div className="container">
+          <Suspense>
+            <MorePosts skip={post._id} limit={2} />
+          </Suspense>
+        </div>
+      </section>
+    </div>
   )
 }

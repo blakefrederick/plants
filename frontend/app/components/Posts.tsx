@@ -5,7 +5,6 @@ import {morePostsQuery, allPostsQuery} from '@/sanity/lib/queries'
 import {AllPostsQueryResult} from '@/sanity.types'
 import DateComponent from '@/app/components/Date'
 import OnBoarding from '@/app/components/Onboarding'
-import Avatar from '@/app/components/Avatar'
 import {dataAttr} from '@/sanity/lib/utils'
 
 const Post = ({post}: {post: AllPostsQueryResult[number]}) => {
@@ -15,26 +14,31 @@ const Post = ({post}: {post: AllPostsQueryResult[number]}) => {
     <article
       data-sanity={dataAttr({id: _id, type: 'post', path: 'title'}).toString()}
       key={_id}
-      className="border border-gray-200 rounded-sm p-6 bg-gray-50 flex flex-col justify-between transition-colors hover:bg-white relative"
+      className="group relative border-b border-stone-200 py-8 first:pt-0"
     >
-      <Link className="hover:text-brand underline transition-colors" href={`/posts/${slug}`}>
+      <Link className="block" href={`/posts/${slug}`}>
         <span className="absolute inset-0 z-10" />
-      </Link>
-      <div>
-        <h3 className="text-2xl mb-4">{title}</h3>
-
-        <p className="line-clamp-3 text-sm leading-6 text-gray-600 max-w-[70ch]">{excerpt}</p>
-      </div>
-      <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-        {author && author.firstName && author.lastName && (
-          <div className="flex items-center">
-            <Avatar person={author} small={true} />
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div className="flex-1">
+            <h3 className="text-xl md:text-2xl text-bark group-hover:text-moss transition-colors mb-3">
+              {title}
+            </h3>
+            <p className="text-stone-500 text-sm leading-relaxed max-w-xl line-clamp-2">
+              {excerpt}
+            </p>
           </div>
-        )}
-        <time className="text-gray-500 text-xs font-mono" dateTime={date}>
-          <DateComponent dateString={date} />
-        </time>
-      </div>
+          <div className="flex items-center gap-4 md:text-right">
+            {author && author.firstName && author.lastName && (
+              <span className="text-sm text-stone-400">
+                {author.firstName} {author.lastName}
+              </span>
+            )}
+            <time className="text-stone-400 text-sm tabular-nums" dateTime={date}>
+              <DateComponent dateString={date} />
+            </time>
+          </div>
+        </div>
+      </Link>
     </article>
   )
 }
@@ -49,9 +53,11 @@ const Posts = ({
   subHeading?: string
 }) => (
   <div>
-    {heading && <h2 className="text-3xl text-gray-900 sm:text-4xl lg:text-5xl">{heading}</h2>}
-    {subHeading && <p className="mt-2 text-lg leading-8 text-gray-600">{subHeading}</p>}
-    <div className="pt-6 space-y-6">{children}</div>
+    {heading && <h2 className="text-2xl md:text-3xl font-light text-bark mb-8">{heading}</h2>}
+    {subHeading && (
+      <p className="text-sage text-sm tracking-widest uppercase mb-8">{subHeading}</p>
+    )}
+    <div>{children}</div>
   </div>
 )
 
@@ -82,9 +88,7 @@ export const AllPosts = async () => {
   }
 
   return (
-    <Posts
-      subHeading={`Recent`}
-    >
+    <Posts subHeading="Journal">
       {data.map((post: AllPostsQueryResult[number]) => (
         <Post key={post._id} post={post} />
       ))}
