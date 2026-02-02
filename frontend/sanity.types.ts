@@ -125,6 +125,94 @@ export type Button = {
   link?: Link
 }
 
+export type Plant = {
+  _id: string
+  _type: 'plant'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+  scientificName?: string
+  commonNames?: Array<string>
+  images?: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt: string
+    caption?: string
+    _type: 'image'
+    _key: string
+  }>
+  description?: BlockContent
+  category:
+    | 'houseplant'
+    | 'tree'
+    | 'shrub'
+    | 'flower'
+    | 'succulent'
+    | 'herb'
+    | 'fern'
+    | 'grass'
+    | 'vine'
+    | 'aquatic'
+  careLevel?: 'beginner' | 'intermediate' | 'advanced' | 'expert'
+  lightRequirements?: 'low' | 'medium' | 'bright-indirect' | 'direct-sun' | 'full-sun'
+  wateringFrequency?: 'daily' | 'few-days' | 'weekly' | 'bi-weekly' | 'monthly' | 'rarely'
+  matureSize?: {
+    height?: number
+    width?: number
+  }
+  isIndoor?: boolean
+  isOutdoor?: boolean
+  toxicity?: {
+    isPetSafe?: boolean
+    isChildSafe?: boolean
+    toxicityNotes?: string
+  }
+  season?: Array<string>
+  price?: number
+  availability?: boolean
+  location?: Geopoint
+  dateAdded?: string
+  tags?: Array<string>
+  seo?: {
+    metaTitle?: string
+    metaDescription?: string
+    keywords?: Array<string>
+  }
+}
+
+export type Geopoint = {
+  _type: 'geopoint'
+  lat?: number
+  lng?: number
+  alt?: number
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
 export type Settings = {
   _id: string
   _type: 'settings'
@@ -163,22 +251,6 @@ export type Settings = {
     metadataBase?: string
     _type: 'image'
   }
-}
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
 }
 
 export type Page = {
@@ -246,12 +318,6 @@ export type Person = {
     alt?: string
     _type: 'image'
   }
-}
-
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
 }
 
 export type SanityAssistInstructionTask = {
@@ -424,6 +490,7 @@ export type SanityImageMetadata = {
   palette?: SanityImagePalette
   lqip?: string
   blurHash?: string
+  thumbHash?: string
   hasAlpha?: boolean
   isOpaque?: boolean
 }
@@ -480,13 +547,6 @@ export type SanityImageAsset = {
   source?: SanityAssetSourceData
 }
 
-export type Geopoint = {
-  _type: 'geopoint'
-  lat?: number
-  lng?: number
-  alt?: number
-}
-
 export type AllSanitySchemaTypes =
   | PageReference
   | PostReference
@@ -497,14 +557,16 @@ export type AllSanitySchemaTypes =
   | BlockContentTextOnly
   | BlockContent
   | Button
-  | Settings
+  | Plant
+  | Geopoint
   | SanityImageCrop
   | SanityImageHotspot
+  | Slug
+  | Settings
   | Page
   | PersonReference
   | Post
   | Person
-  | Slug
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations
@@ -525,9 +587,14 @@ export type AllSanitySchemaTypes =
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
-  | Geopoint
 
 export declare const internalGroqTypeReferenceTo: unique symbol
+
+type ArrayOf<T> = Array<
+  T & {
+    _key: string
+  }
+>
 
 // Source: sanity/lib/queries.ts
 // Variable: settingsQuery
@@ -812,6 +879,77 @@ export type PagesSlugsResult = Array<{
   slug: string
 }>
 
+// Source: sanity/lib/queries.ts
+// Variable: allPlantsQuery
+// Query: *[_type == "plant" && availability != false]  | order(coalesce(dateAdded, _createdAt) desc) {    _id,    name,    "slug": slug.current,    scientificName,    "image": images[0]{      alt,      "url": asset->url    },    category,    careLevel,    price,    "petSafe": toxicity.isPetSafe,    "description": pt::text(description[0...1])  }
+export type AllPlantsQueryResult = Array<{
+  _id: string
+  name: string
+  slug: string
+  scientificName: string | null
+  image: {
+    alt: string
+    url: string | null
+  } | null
+  category:
+    | 'aquatic'
+    | 'fern'
+    | 'flower'
+    | 'grass'
+    | 'herb'
+    | 'houseplant'
+    | 'shrub'
+    | 'succulent'
+    | 'tree'
+    | 'vine'
+  careLevel: 'advanced' | 'beginner' | 'expert' | 'intermediate' | null
+  price: number | null
+  petSafe: boolean | null
+  description: string
+}>
+
+// Source: sanity/lib/queries.ts
+// Variable: plantDetailsQuery
+// Query: *[_type == "plant" && slug.current == $slug][0]{    _id,    name,    scientificName,    commonNames,    images[]{      alt,      caption,      "url": asset->url    },    description,    category,    careLevel,    lightRequirements,    wateringFrequency,    "size": matureSize,    "toxicity": toxicity,    price,    availability,    tags  }
+export type PlantDetailsQueryResult = {
+  _id: string
+  name: string
+  scientificName: string | null
+  commonNames: Array<string> | null
+  images: Array<{
+    alt: string
+    caption: string | null
+    url: string | null
+  }> | null
+  description: BlockContent | null
+  category:
+    | 'aquatic'
+    | 'fern'
+    | 'flower'
+    | 'grass'
+    | 'herb'
+    | 'houseplant'
+    | 'shrub'
+    | 'succulent'
+    | 'tree'
+    | 'vine'
+  careLevel: 'advanced' | 'beginner' | 'expert' | 'intermediate' | null
+  lightRequirements: 'bright-indirect' | 'direct-sun' | 'full-sun' | 'low' | 'medium' | null
+  wateringFrequency: 'bi-weekly' | 'daily' | 'few-days' | 'monthly' | 'rarely' | 'weekly' | null
+  size: {
+    height?: number
+    width?: number
+  } | null
+  toxicity: {
+    isPetSafe?: boolean
+    isChildSafe?: boolean
+    toxicityNotes?: string
+  } | null
+  price: number | null
+  availability: boolean | null
+  tags: Array<string> | null
+} | null
+
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
@@ -824,5 +962,7 @@ declare module '@sanity/client' {
     '\n  *[_type == "post" && slug.current == $slug] [0] {\n    content[]{\n    ...,\n    markDefs[]{\n      ...,\n      \n  _type == "link" => {\n    "page": page->slug.current,\n    "post": post->slug.current\n  }\n\n    }\n  },\n    \n  _id,\n  "status": select(_originalId in path("drafts.**") => "draft", "published"),\n  "title": coalesce(title, "Untitled"),\n  "slug": slug.current,\n  excerpt,\n  coverImage,\n  "date": coalesce(date, _updatedAt),\n  "author": author->{firstName, lastName, picture},\n\n  }\n': PostQueryResult
     '\n  *[_type == "post" && defined(slug.current)]\n  {"slug": slug.current}\n': PostPagesSlugsResult
     '\n  *[_type == "page" && defined(slug.current)]\n  {"slug": slug.current}\n': PagesSlugsResult
+    '\n  *[_type == "plant" && availability != false]\n  | order(coalesce(dateAdded, _createdAt) desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    scientificName,\n    "image": images[0]{\n      alt,\n      "url": asset->url\n    },\n    category,\n    careLevel,\n    price,\n    "petSafe": toxicity.isPetSafe,\n    "description": pt::text(description[0...1])\n  }\n': AllPlantsQueryResult
+    '\n  *[_type == "plant" && slug.current == $slug][0]{\n    _id,\n    name,\n    scientificName,\n    commonNames,\n    images[]{\n      alt,\n      caption,\n      "url": asset->url\n    },\n    description,\n    category,\n    careLevel,\n    lightRequirements,\n    wateringFrequency,\n    "size": matureSize,\n    "toxicity": toxicity,\n    price,\n    availability,\n    tags\n  }\n': PlantDetailsQueryResult
   }
 }
