@@ -1,0 +1,92 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pr:
+  branches:
+    include:
+      - main
+
+variables:
+  nodeVersion: "18.x"
+
+  ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+    deploymentEnvironment: "production"
+  ${{ else }}:
+    deploymentEnvironment: "staging"
+
+stages:
+  # =========================
+  # Build Stage
+  # =========================
+  - stage: Build
+    displayName: "Build Next.js App"
+    jobs:
+      - job: BuildApp
+        displayName: "Build"
+        pool:
+          vmImage: "ubuntu-latest"
+
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: $(nodeVersion)
+
+          - task: Cache@2
+            inputs:
+              key: 'npm | "$(Agent.OS)" | frontend/package-lock.json'
+              path: $(Pipeline.Workspace)/.npm
+
+          - script: |
+              cd frontend
+              npm ci --cache $(Pipeline.Workspace)/.npm
+              npm run build
+            displayName: "Install & Build"
+            env:
+              NEXT_PUBLIC_SANITY_PROJECT_ID: $(SANITY_PROJECT_ID)
+              NEXT_PUBLIC_SANITY_DATASET: $(SANITY_DATASET)
+              SANITY_API_READ_TOKEN: $(SANITY_API_READ_TOKEN)
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: "frontend"
+              ArtifactName: "app"
+              publishLocation: "Container"
+
+  # =========================
+  # Deploy Stage
+  # =========================
+  - stage: Deploy
+    displayName: "Deploy"
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+    jobs:
+      - deployment: DeployApp
+        displayName: "Deploy to $(deploymentEnvironment)"
+        environment: $(deploymentEnvironment)
+        pool:
+          vmImage: "ubuntu-latest"
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: app
+
+                - task: AzureWebApp@1
+                  displayName: "Deploy Next.js App"
+                  inputs:
+                    azureSubscription: "Azure-ServiceConnection"
+                    appName: "plants-app-$(deploymentEnvironment)"
+                    package: "$(Pipeline.Workspace)/app"
+                    runtimeStack: "NODE|18-lts"
+                    startupCommand: |
+                      npm install --production
+                      npm run start
+
+                - script: echo "Deployed to $(deploymentEnvironment)"
+                  displayName: "Deployment Complete"
