@@ -60,17 +60,17 @@ export async function PlantStats() {
         {metadata.recentPlants.length > 0 && (
           <div>
             <p className="text-sage text-sm tracking-widest uppercase mb-6">Recent Additions</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {metadata.recentPlants.map((plant) => (
                 <Link
                   key={plant.slug}
-                  href={`/`}
-                  className="group block p-6 border border-stone-200 hover:border-moss transition-colors"
+                  href={`/plants/${plant.slug}`}
+                  className="group block p-5 border border-stone-200 hover:border-moss transition-colors"
                 >
-                  <div className="text-lg text-bark group-hover:text-moss transition-colors mb-2">
+                  <div className="text-base text-bark group-hover:text-moss transition-colors mb-1">
                     {plant.name}
                   </div>
-                  <div className="text-sm text-stone-500 capitalize">
+                  <div className="text-xs text-stone-400 capitalize">
                     {plant.category} · {plant.careLevel}
                   </div>
                 </Link>

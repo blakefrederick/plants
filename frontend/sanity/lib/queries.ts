@@ -127,7 +127,7 @@ export const plantsStatsQuery = defineQuery(`
     "averagePrice": round(math::avg(*[_type == "plant" && defined(price)].price)),
     "recentPlants": *[_type == "plant"] 
       | order(coalesce(dateAdded, _createdAt) desc) 
-      [0...9] {
+      [0...12] {
         name,
         "slug": slug.current,
         category,
@@ -159,4 +159,9 @@ export const plantDetailsQuery = defineQuery(`
     availability,
     tags
   }
+`)
+
+export const plantsSlugs = defineQuery(`
+  *[_type == "plant" && defined(slug.current)]
+  {"slug": slug.current}
 `)
