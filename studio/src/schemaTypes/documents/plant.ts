@@ -1,4 +1,3 @@
-import {LeafIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
 /**
@@ -8,7 +7,7 @@ import {defineField, defineType} from 'sanity'
 export const plant = defineType({
   name: 'plant',
   title: 'Plant',
-  icon: LeafIcon,
+  icon: '🌿',
   type: 'document',
   fields: [
     defineField({

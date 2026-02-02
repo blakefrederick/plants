@@ -125,6 +125,94 @@ export type Button = {
   link?: Link
 }
 
+export type Plant = {
+  _id: string
+  _type: 'plant'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  name: string
+  slug: Slug
+  scientificName?: string
+  commonNames?: Array<string>
+  images?: Array<{
+    asset?: SanityImageAssetReference
+    media?: unknown
+    hotspot?: SanityImageHotspot
+    crop?: SanityImageCrop
+    alt: string
+    caption?: string
+    _type: 'image'
+    _key: string
+  }>
+  description?: BlockContent
+  category:
+    | 'houseplant'
+    | 'tree'
+    | 'shrub'
+    | 'flower'
+    | 'succulent'
+    | 'herb'
+    | 'fern'
+    | 'grass'
+    | 'vine'
+    | 'aquatic'
+  careLevel?: 'beginner' | 'intermediate' | 'advanced' | 'expert'
+  lightRequirements?: 'low' | 'medium' | 'bright-indirect' | 'direct-sun' | 'full-sun'
+  wateringFrequency?: 'daily' | 'few-days' | 'weekly' | 'bi-weekly' | 'monthly' | 'rarely'
+  matureSize?: {
+    height?: number
+    width?: number
+  }
+  isIndoor?: boolean
+  isOutdoor?: boolean
+  toxicity?: {
+    isPetSafe?: boolean
+    isChildSafe?: boolean
+    toxicityNotes?: string
+  }
+  season?: Array<string>
+  price?: number
+  availability?: boolean
+  location?: Geopoint
+  dateAdded?: string
+  tags?: Array<string>
+  seo?: {
+    metaTitle?: string
+    metaDescription?: string
+    keywords?: Array<string>
+  }
+}
+
+export type Geopoint = {
+  _type: 'geopoint'
+  lat?: number
+  lng?: number
+  alt?: number
+}
+
+export type SanityImageCrop = {
+  _type: 'sanity.imageCrop'
+  top: number
+  bottom: number
+  left: number
+  right: number
+}
+
+export type SanityImageHotspot = {
+  _type: 'sanity.imageHotspot'
+  x: number
+  y: number
+  height: number
+  width: number
+}
+
+export type Slug = {
+  _type: 'slug'
+  current: string
+  source?: string
+}
+
 export type Settings = {
   _id: string
   _type: 'settings'
@@ -163,22 +251,6 @@ export type Settings = {
     metadataBase?: string
     _type: 'image'
   }
-}
-
-export type SanityImageCrop = {
-  _type: 'sanity.imageCrop'
-  top: number
-  bottom: number
-  left: number
-  right: number
-}
-
-export type SanityImageHotspot = {
-  _type: 'sanity.imageHotspot'
-  x: number
-  y: number
-  height: number
-  width: number
 }
 
 export type Page = {
@@ -246,12 +318,6 @@ export type Person = {
     alt?: string
     _type: 'image'
   }
-}
-
-export type Slug = {
-  _type: 'slug'
-  current: string
-  source?: string
 }
 
 export type SanityAssistInstructionTask = {
@@ -424,6 +490,7 @@ export type SanityImageMetadata = {
   palette?: SanityImagePalette
   lqip?: string
   blurHash?: string
+  thumbHash?: string
   hasAlpha?: boolean
   isOpaque?: boolean
 }
@@ -480,13 +547,6 @@ export type SanityImageAsset = {
   source?: SanityAssetSourceData
 }
 
-export type Geopoint = {
-  _type: 'geopoint'
-  lat?: number
-  lng?: number
-  alt?: number
-}
-
 export type AllSanitySchemaTypes =
   | PageReference
   | PostReference
@@ -497,14 +557,16 @@ export type AllSanitySchemaTypes =
   | BlockContentTextOnly
   | BlockContent
   | Button
-  | Settings
+  | Plant
+  | Geopoint
   | SanityImageCrop
   | SanityImageHotspot
+  | Slug
+  | Settings
   | Page
   | PersonReference
   | Post
   | Person
-  | Slug
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus
   | SanityAssistSchemaTypeAnnotations
@@ -525,6 +587,11 @@ export type AllSanitySchemaTypes =
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
-  | Geopoint
 
 export declare const internalGroqTypeReferenceTo: unique symbol
+
+type ArrayOf<T> = Array<
+  T & {
+    _key: string
+  }
+>

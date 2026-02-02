@@ -3,6 +3,7 @@ import Link from 'next/link'
 import {PortableText} from '@portabletext/react'
 
 import {AllPosts} from '@/app/components/Posts'
+import {PlantStats} from '@/app/components/PlantStats'
 import {settingsQuery} from '@/sanity/lib/queries'
 import {sanityFetch} from '@/sanity/lib/live'
 import {dataAttr} from '@/sanity/lib/utils'
@@ -52,6 +53,11 @@ export default async function Page() {
           </div>
         </div>
       </div>
+      
+      <Suspense fallback={<div className="bg-green-50 py-16 animate-pulse" />}>
+        <PlantStats />
+      </Suspense>
+
       <div className="relative emerald-100">
         <div className="container">
           <aside className="py-12 sm:py-20">

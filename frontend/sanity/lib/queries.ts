@@ -119,6 +119,23 @@ export const allPlantsQuery = defineQuery(`
   }
 `)
 
+export const plantsStatsQuery = defineQuery(`
+  {
+    "totalPlants": count(*[_type == "plant"]),
+    "availablePlants": count(*[_type == "plant" && availability == true]),
+    "petSafePlants": count(*[_type == "plant" && toxicity.isPetSafe == true]),
+    "averagePrice": round(math::avg(*[_type == "plant" && defined(price)].price)),
+    "recentPlants": *[_type == "plant"] 
+      | order(coalesce(dateAdded, _createdAt) desc) 
+      [0...3] {
+        name,
+        "slug": slug.current,
+        category,
+        careLevel
+      }
+  }
+`)
+
 
 export const plantDetailsQuery = defineQuery(`
   *[_type == "plant" && slug.current == $slug][0]{
