@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {ImagesInputWithFetch} from '../../components/ImagesInputWithFetch'
 
 /**
  * Plant schema.
@@ -56,6 +57,7 @@ export const plant = defineType({
       name: 'images',
       title: 'Images',
       type: 'array',
+      description: 'Upload images manually using the "+ Add Item" button, or auto-fetch plant images using the "Fetch Plant Image" button below!',
       of: [
         {
           type: 'image',
@@ -77,6 +79,9 @@ export const plant = defineType({
         },
       ],
       validation: (rule) => rule.max(10),
+      components: {
+        input: ImagesInputWithFetch,
+      },
     }),
     defineField({
       name: 'description',

@@ -589,9 +589,3 @@ export type AllSanitySchemaTypes =
   | SanityImageAsset
 
 export declare const internalGroqTypeReferenceTo: unique symbol
-
-type ArrayOf<T> = Array<
-  T & {
-    _key: string
-  }
->

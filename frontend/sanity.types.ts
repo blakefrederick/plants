@@ -590,12 +590,6 @@ export type AllSanitySchemaTypes =
 
 export declare const internalGroqTypeReferenceTo: unique symbol
 
-type ArrayOf<T> = Array<
-  T & {
-    _key: string
-  }
->
-
 // Source: sanity/lib/queries.ts
 // Variable: settingsQuery
 // Query: *[_type == "settings"][0]
@@ -908,6 +902,9 @@ export type AllPlantsQueryResult = Array<{
   description: string
 }>
 
+// Source: sanity/lib/queries.ts
+// Variable: plantsStatsQuery
+// Query: {    "totalPlants": count(*[_type == "plant"]),    "availablePlants": count(*[_type == "plant" && availability == true]),    "petSafePlants": count(*[_type == "plant" && toxicity.isPetSafe == true]),    "averagePrice": round(math::avg(*[_type == "plant" && defined(price)].price)),    "recentPlants": *[_type == "plant"]       | order(coalesce(dateAdded, _createdAt) desc)       [0...12] {        name,        "slug": slug.current,        category,        careLevel      }  }
 export type PlantsStatsQueryResult = {
   totalPlants: number
   availablePlants: number
@@ -973,6 +970,13 @@ export type PlantDetailsQueryResult = {
   tags: Array<string> | null
 } | null
 
+// Source: sanity/lib/queries.ts
+// Variable: plantsSlugs
+// Query: *[_type == "plant" && defined(slug.current)]  {"slug": slug.current}
+export type PlantsSlugsResult = Array<{
+  slug: string
+}>
+
 // Query TypeMap
 import '@sanity/client'
 declare module '@sanity/client' {
@@ -986,7 +990,8 @@ declare module '@sanity/client' {
     '\n  *[_type == "post" && defined(slug.current)]\n  {"slug": slug.current}\n': PostPagesSlugsResult
     '\n  *[_type == "page" && defined(slug.current)]\n  {"slug": slug.current}\n': PagesSlugsResult
     '\n  *[_type == "plant" && availability != false]\n  | order(coalesce(dateAdded, _createdAt) desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    scientificName,\n    "image": images[0]{\n      alt,\n      "url": asset->url\n    },\n    category,\n    careLevel,\n    price,\n    "petSafe": toxicity.isPetSafe,\n    "description": pt::text(description[0...1])\n  }\n': AllPlantsQueryResult
-    '\n  {\n    "totalPlants": count(*[_type == "plant"]),\n    "availablePlants": count(*[_type == "plant" && availability == true]),\n    "petSafePlants": count(*[_type == "plant" && toxicity.isPetSafe == true]),\n    "averagePrice": round(math::avg(*[_type == "plant" && defined(price)].price)),\n    "recentPlants": *[_type == "plant"] \n      | order(coalesce(dateAdded, _createdAt) desc) \n      [0...3] {\n        name,\n        "slug": slug.current,\n        category,\n        careLevel\n      }\n  }\n': PlantsStatsQueryResult
+    '\n  {\n    "totalPlants": count(*[_type == "plant"]),\n    "availablePlants": count(*[_type == "plant" && availability == true]),\n    "petSafePlants": count(*[_type == "plant" && toxicity.isPetSafe == true]),\n    "averagePrice": round(math::avg(*[_type == "plant" && defined(price)].price)),\n    "recentPlants": *[_type == "plant"] \n      | order(coalesce(dateAdded, _createdAt) desc) \n      [0...12] {\n        name,\n        "slug": slug.current,\n        category,\n        careLevel\n      }\n  }\n': PlantsStatsQueryResult
     '\n  *[_type == "plant" && slug.current == $slug][0]{\n    _id,\n    name,\n    scientificName,\n    commonNames,\n    images[]{\n      alt,\n      caption,\n      "url": asset->url\n    },\n    description,\n    category,\n    careLevel,\n    lightRequirements,\n    wateringFrequency,\n    "size": matureSize,\n    "toxicity": toxicity,\n    price,\n    availability,\n    tags\n  }\n': PlantDetailsQueryResult
+    '\n  *[_type == "plant" && defined(slug.current)]\n  {"slug": slug.current}\n': PlantsSlugsResult
   }
 }
