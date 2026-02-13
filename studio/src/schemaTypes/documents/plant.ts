@@ -9,6 +9,18 @@ export const plant = defineType({
   title: 'Plant',
   icon: '🌿',
   type: 'document',
+  orderings: [
+    {
+      title: 'Price (Low → High)',
+      name: 'priceAsc',
+      by: [{field: 'price', direction: 'asc'}],
+    },
+    {
+      title: 'Price (High → Low)',
+      name: 'priceDesc',
+      by: [{field: 'price', direction: 'desc'}],
+    },
+  ],
   fields: [
     defineField({
       name: 'name',
