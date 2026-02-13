@@ -290,19 +290,31 @@ export const plant = defineType({
       },
     }),
   ],
-  preview: {
-    select: {
-      title: 'name',
-      subtitle: 'scientificName',
-      media: 'images.0',
-    },
-    prepare(selection) {
-      const {title, subtitle, media} = selection
-      return {
-        title: title,
-        subtitle: subtitle ? `(${subtitle})` : '',
-        media: media,
-      }
-    },
+preview: {
+  select: {
+    title: 'name',
+    subtitle: 'scientificName',
+    media: 'images.0',
+    price: 'price',
+    availability: 'availability',
   },
+  prepare(selection) {
+    const {title, subtitle, media, price, availability} = selection
+
+    const formattedPrice =
+      typeof price === 'number'
+        ? `$${price.toFixed(2)} CAD`
+        : 'No price'
+
+    const availabilityLabel =
+      availability === false ? ' • Unavailable' : ''
+
+    return {
+      title,
+      subtitle: `${subtitle ? `(${subtitle}) • ` : ''}${formattedPrice}${availabilityLabel}`,
+      media,
+    }
+  },
+},
+
 })
